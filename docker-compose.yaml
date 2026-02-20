@@ -1,0 +1,39 @@
+services:
+
+  mongo:
+    image: mongo:6.0
+    container_name: mongo_auth
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: auth-service
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - cristal-network
+
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth-service
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+    networks:
+      - cristal-network
+
+
+volumes:
+  mongo_data:
+
+
+networks:
+  cristal-network:
+    driver: bridge
